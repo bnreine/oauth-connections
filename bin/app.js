@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-const cdk = require('aws-cdk-lib');
-const { PipelineStack } = require('../lib/pipeline-stack');
+import * as cdk from 'aws-cdk-lib'
+import { PipelineStack } from '../lib/pipeline-stack.js'
 
 const app = new cdk.App();
 
