@@ -10,7 +10,7 @@ export const handler = async (event) => {
         const channelId = event.pathParameters?.channelId;
         const userId = event?.requestContext?.authorizer?.jwt?.claims?.sub;
 
-        const stateHash = randomUUID();
+        const state = randomUUID();
 
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
         const createdAt = new Date(Date.now());
@@ -22,7 +22,7 @@ export const handler = async (event) => {
       "id",                        
       "userId",
       "provider",
-      "stateHash",
+      "state",
                               "metadata",
       "expiresAt",
                               "usedAt",
@@ -31,10 +31,10 @@ export const handler = async (event) => {
     VALUES ($1, $2, $3, $4, $5,$6,$7,$8)
   `,
             [
-                stateHash,
+                state,
                 userId,
                 channelId,
-                stateHash,
+                state,
                 {},
                 expiresAt,
                 null,
@@ -48,7 +48,7 @@ export const handler = async (event) => {
             scope: "incoming-webhook",
             redirect_uri:
         `https://api2.notifications.benjaminreinecke.click/channels/${channelId}/oauth-connections/callback`,
-            stateHash,
+            state,
     });
 
         const authorizationUrl =
