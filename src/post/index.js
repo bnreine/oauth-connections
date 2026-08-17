@@ -7,7 +7,20 @@ export const handler = async (event) => {
         // console.log('NODE_ENV:', process.env.NODE_ENV);
         // console.log('SLACK_CLIENT_ID:', process.env.SLACK_CLIENT_ID);
         console.log('event: ', event);
-        const channelId = event.pathParameters?.channelId;
+        const channelId = event.pathParameters?.channelId; // validate this
+
+        if (channelId !== 'slack') {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    error: {
+                        message: `Unsupported channel: ${channelId}`,
+                    },
+                }),
+            };
+        }
+
+
         const userId = event?.requestContext?.authorizer?.jwt?.claims?.sub;
 
         const state = randomUUID();
