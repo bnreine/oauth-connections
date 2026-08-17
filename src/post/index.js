@@ -1,12 +1,16 @@
 import hal from 'halson'
 import { getDbPool } from '/opt/nodejs/db/connection.js';
+import { randomUUID } from 'node:crypto';
 
 export const handler = async (event) => {
     try{
+        // console.log('NODE_ENV:', process.env.NODE_ENV);
+        // console.log('SLACK_CLIENT_ID:', process.env.SLACK_CLIENT_ID);
+        console.log('event: ', event);
         const channelId = event.pathParameters?.channelId;
         const userId = event?.requestContext?.authorizer?.jwt?.claims?.sub;
 
-        const stateHash = crypto.randomBytes(32).toString("hex");
+        const stateHash = randomUUID();
 
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
         const createdAt = new Date(Date.now());

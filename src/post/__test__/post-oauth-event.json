@@ -1,0 +1,15 @@
+{
+  "requestContext": {
+    "authorizer": {
+      "jwt": {
+        "claims": {
+          "sub": "44085488-0091-707c-2208-9b6753027a15"
+        }
+      }
+    }
+  },
+  "pathParameters": {
+    "channelId": "slack"
+  },
+  "body": "{}"
+}
