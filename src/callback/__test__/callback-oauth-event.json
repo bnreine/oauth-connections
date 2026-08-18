@@ -1,0 +1,9 @@
+{
+  "pathParameters": {
+    "channelId": "slack"
+  },
+  "queryStringParameters": {
+    "code": "slack-oauth-code",
+    "state": "oauth-state"
+  }
+}

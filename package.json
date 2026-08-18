@@ -6,7 +6,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "postinstall": "npm ci --prefix src/post",
+    "postinstall": "npm ci --prefix src/post && npm ci --prefix src/callback",
     "build": "echo \"The build step is not required when using JavaScript!\" && exit 0",
     "cdk": "cdk",
     "synth": "cdk synth",

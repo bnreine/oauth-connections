@@ -72,7 +72,6 @@ export const handler = async (event) => {
         return {
             statusCode: 200,
             headers: {
-                // Location: resourceHref,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(resource),
