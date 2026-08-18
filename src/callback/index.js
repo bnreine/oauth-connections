@@ -37,6 +37,16 @@ export const handler = async (event) => {
             };
         }
 
+        await dbPool.query(
+            `
+            UPDATE "OAuthState"
+            SET "usedAt" = $1
+            WHERE "state" = $2
+              AND "provider" = $3
+              AND "usedAt" IS NULL
+            `,
+            [new Date(), state, channelId]
+        );
 
         const clientId = process.env.SLACK_CLIENT_ID;
         const clientSecretName = process.env.SLACK_CLIENT_SECRET_NAME;
