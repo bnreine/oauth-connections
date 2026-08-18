@@ -3,6 +3,7 @@ import {
     SecretsManagerClient,
     GetSecretValueCommand,
 } from '@aws-sdk/client-secrets-manager';
+import { randomUUID } from 'node:crypto';
 
 export const handler = async (event) => {
     try {
@@ -91,39 +92,45 @@ export const handler = async (event) => {
             };
         }
 
-        // console.log('to store: ', JSON.stringify({
-        //     provider: 'slack',
-        //
-        //     externalAccountId: tokenExchangeResult.team.id,
-        //
-        //     metadata: {
-        //         workspaceId: tokenExchangeResult.team.id,
-        //         workspaceName: tokenExchangeResult.team.name,
-        //
-        //         channelId: tokenExchangeResult.incoming_webhook.channel_id,
-        //         channelName: tokenExchangeResult.incoming_webhook.channel,
-        //
-        //         configurationUrl:
-        //         tokenExchangeResult.incoming_webhook.configuration_url,
-        //
-        //         scopes: tokenExchangeResult.scope
-        //     },
-        //
-        //     credentials: {
-        //         webhookUrl: tokenExchangeResult.incoming_webhook.url
-        //     }
-        // }));
+        const team = tokenExchangeResult.team ?? {};
+        const incomingWebhook = tokenExchangeResult.incoming_webhook ?? {};
+        const now = new Date();
+
+        await dbPool.query(
+            `
+            INSERT INTO "OAuthConnection" (
+              "id",
+              "userId",
+              "provider",
+              "providerAccountId",
+              "metadata",
+              "createdAt"
+            )
+            VALUES ($1, $2, $3, $4, $5, $6)
+            `,
+            [
+                randomUUID(),
+                userId,
+                channelId,
+                team.id,
+                {
+                    workspaceId: team.id,
+                    workspaceName: team.name,
+                    channelId: incomingWebhook.channel_id,
+                    channelName: incomingWebhook.channel,
+                    configurationUrl: incomingWebhook.configuration_url,
+                    scopes: tokenExchangeResult.scope,
+                    webhookUrl: incomingWebhook.url,
+                },
+                now
+            ]
+        );
 
         return {
             statusCode: 200,
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                channelId,
-                // code,
-                // state,
-            }),
         };
     } catch (e) {
         return {
