@@ -11,21 +11,19 @@ export const handler = async (event) => {
         const channelId = event.pathParameters?.channelId;
         const code = event.queryStringParameters?.code;
         const state = event.queryStringParameters?.state;
-        const userId = event?.requestContext?.authorizer?.jwt?.claims?.sub;
 
         const dbPool = await getDbPool('write_read_rds_db');
         const dbResult = await dbPool.query(
             `
-            SELECT 1
+            SELECT "userId"
             FROM "OAuthState"
-            WHERE "userId" = $1
-              AND "state" = $2
-              AND "provider" = $3
+              WHERE "state" = $1
+              AND "provider" = $2
               AND "usedAt" IS NULL
-              AND "expiresAt" > $4
+              AND "expiresAt" > $3
             LIMIT 1
             `,
-            [userId, state, channelId, new Date()]
+            [state, channelId, new Date()]
         );
 
         if (dbResult.rowCount === 0) {
@@ -110,7 +108,7 @@ export const handler = async (event) => {
             `,
             [
                 randomUUID(),
-                userId,
+                dbResult.rows[0].userId,
                 channelId,
                 team.id,
                 {
