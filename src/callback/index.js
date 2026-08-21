@@ -8,11 +8,11 @@ import { randomUUID } from 'node:crypto';
 export const handler = async (event) => {
     try {
         console.log('event: ', event);
-        const channelId = event.pathParameters?.channelId;
+        const provider = event.pathParameters?.provider;
         const code = event.queryStringParameters?.code;
         const state = event.queryStringParameters?.state;
 
-        const dbPool = await getDbPool('write_read_rds_db');
+        const dbPool = await getDbPool('write_read_rds_db'); // shoud use read thing here because that is safer before the validation check
         const dbResult = await dbPool.query(
             `
             SELECT "userId"
@@ -23,7 +23,7 @@ export const handler = async (event) => {
               AND "expiresAt" > $3
             LIMIT 1
             `,
-            [state, channelId, new Date()]
+            [state, provider, new Date()]
         );
 
         if (dbResult.rowCount === 0) {
@@ -45,7 +45,7 @@ export const handler = async (event) => {
               AND "provider" = $3
               AND "usedAt" IS NULL
             `,
-            [new Date(), state, channelId]
+            [new Date(), state, provider]
         );
 
         const clientId = process.env.SLACK_CLIENT_ID;
@@ -64,7 +64,7 @@ export const handler = async (event) => {
         const clientSecret = secret.clientSecret;
 
         const redirectUri =
-            'https://api2.notifications.benjaminreinecke.click/channels/slack/oauth-connections/callback';
+            `https://api2.notifications.benjaminreinecke.click/providers/${provider}/oauth-connections/callback`;
 
         const basicAuth = Buffer
             .from(`${clientId}:${clientSecret}`)
@@ -103,6 +103,7 @@ export const handler = async (event) => {
         const team = tokenExchangeResult.team ?? {};
         const incomingWebhook = tokenExchangeResult.incoming_webhook ?? {};
         const now = new Date();
+        const oAuthConnectionId = randomUUID()
 
         await dbPool.query(
             `
@@ -111,7 +112,33 @@ export const handler = async (event) => {
               "userId",
               "provider",
               "providerAccountId",
+              "authData",
+              "createdAt"
+            )
+            VALUES ($1, $2, $3, $4, $5, $6)
+            `,
+            [
+                oAuthConnectionId,
+                dbResult.rows[0].userId,
+                provider,
+                team.id,
+                {
+                    configurationUrl: incomingWebhook.configuration_url,
+                    scopes: tokenExchangeResult.scope,
+                    webhookUrl: incomingWebhook.url,
+                },
+                now
+            ]
+        );
+
+        await dbPool.query(
+            `
+            INSERT INTO "Destination" (
+              "id",
+              "userId",
+              "channelType",
               "metadata",
+              "oAuthConnectionId",
               "createdAt"
             )
             VALUES ($1, $2, $3, $4, $5, $6)
@@ -119,17 +146,14 @@ export const handler = async (event) => {
             [
                 randomUUID(),
                 dbResult.rows[0].userId,
-                channelId,
-                team.id,
+                "slack",
                 {
                     workspaceId: team.id,
                     workspaceName: team.name,
                     channelId: incomingWebhook.channel_id,
                     channelName: incomingWebhook.channel,
-                    configurationUrl: incomingWebhook.configuration_url,
-                    scopes: tokenExchangeResult.scope,
-                    webhookUrl: incomingWebhook.url,
                 },
+                oAuthConnectionId,
                 now
             ]
         );

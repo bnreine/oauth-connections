@@ -1,6 +1,6 @@
 {
   "pathParameters": {
-    "channelId": "slack"
+    "provider": "slack"
   },
   "queryStringParameters": {
     "code": "",
