@@ -7,14 +7,14 @@ export const handler = async (event) => {
         // console.log('NODE_ENV:', process.env.NODE_ENV);
         // console.log('SLACK_CLIENT_ID:', process.env.SLACK_CLIENT_ID);
         console.log('event: ', event);
-        const channelId = event.pathParameters?.channelId; // validate this
+        const provider = event.pathParameters?.provider; // validate this
 
-        if (channelId !== 'slack') {
+        if (provider !== 'slack') {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
                     error: {
-                        message: `Unsupported channel: ${channelId}`,
+                        message: `Unsupported provider: ${provider}`,
                     },
                 }),
             };
@@ -46,7 +46,7 @@ export const handler = async (event) => {
             [
                 state,
                 userId,
-                channelId,
+                provider,
                 state,
                 {},
                 expiresAt,
@@ -60,7 +60,7 @@ export const handler = async (event) => {
             client_id: process.env.SLACK_CLIENT_ID,
             scope: "incoming-webhook",
             redirect_uri:
-        `https://api2.notifications.benjaminreinecke.click/channels/${channelId}/oauth-connections/callback`,
+        `https://api2.notifications.benjaminreinecke.click/providers/${provider}/oauth-connections/callback`,
             state,
     });
 
@@ -68,7 +68,7 @@ export const handler = async (event) => {
             `https://slack.com/oauth/v2/authorize?${params.toString()}`;
 
 
-        const resource = hal({authorizationUrl}).addLink('self', `https://api2.notifications.benjaminreinecke.click/channels/${channelId}/oauth-connections`);
+        const resource = hal({authorizationUrl}).addLink('self', `https://api2.notifications.benjaminreinecke.click/providers/${provider}/oauth-connections`);
         return {
             statusCode: 200,
             headers: {

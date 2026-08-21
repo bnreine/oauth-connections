@@ -9,7 +9,7 @@
     }
   },
   "pathParameters": {
-    "channelId": "slack"
+    "provider": "slack"
   },
   "body": "{}"
 }
