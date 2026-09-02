@@ -126,6 +126,7 @@ export const handler = async (event) => {
                     configurationUrl: incomingWebhook.configuration_url,
                     scopes: tokenExchangeResult.scope,
                     webhookUrl: incomingWebhook.url,
+                    accessToken: tokenExchangeResult.access_token,
                 },
                 now
             ]
