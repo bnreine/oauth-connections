@@ -159,26 +159,17 @@ export const handler = async (event) => {
             ]
         );
 
-        const headers = event.headers;
-        const { host, 'x-forwarded-proto': protocol } = headers;
-
-        const successLocation = `${protocol}://${host}/oauth/slack?status=success`;
-
         return {
             statusCode: 302,
             headers: {
-                "Location": successLocation,
+                "Location": 'https://notifications.benjaminreinecke.click/oauth/slack?status=success',
                 'Content-Type': 'application/json',
             },
         };
     } catch (e) {
-        const headers = event.headers;
-        const { host, 'x-forwarded-proto': protocol } = headers;
-
-        const errorLocation = `${protocol}://${host}/oauth/slack?status=error`;
         return {
             headers: {
-                "Location":errorLocation,
+                "Location": 'https://notifications.benjaminreinecke.click/oauth/slack?status=error',
                 'Content-Type': 'application/json',
             },
             statusCode: 302,
