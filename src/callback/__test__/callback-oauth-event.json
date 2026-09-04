@@ -1,4 +1,18 @@
 {
+  "headers": {
+    "accept": "application/json;v=2",
+    "accept-encoding": "gzip, deflate, br",
+    "authorization": "abcd",
+    "content-length": "33",
+    "content-type": "application/json",
+    "host": "localhost:3000",
+    "postman-token": "be820a98-5967-40ed-82f4-b4c8b49f7c3d",
+    "user-agent": "PostmanRuntime/7.37.3",
+    "x-amzn-trace-id": "Root=1-6a0f66cd-35667e5b4e5a34b01e589320",
+    "x-forwarded-for": "179.218.10.163",
+    "x-forwarded-port": "443",
+    "x-forwarded-proto": "http"
+  },
   "pathParameters": {
     "provider": "slack"
   },

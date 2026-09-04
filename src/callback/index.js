@@ -159,15 +159,30 @@ export const handler = async (event) => {
             ]
         );
 
+        const headers = event.headers;
+        const { host, 'x-forwarded-proto': protocol } = headers;
+
+        const successLocation = `${protocol}://${host}/oauth/slack?status=success`;
+
         return {
-            statusCode: 200,
+            statusCode: 302,
             headers: {
+                "Location": successLocation,
                 'Content-Type': 'application/json',
             },
         };
     } catch (e) {
+        const headers = event.headers;
+        const { host, 'x-forwarded-proto': protocol } = headers;
+
+        const errorLocation = `${protocol}://${host}/oauth/slack?status=error`;
         return {
-            statusCode: 500,
+            headers: {
+                "Location":errorLocation,
+                'Content-Type': 'application/json',
+            },
+            statusCode: 302,
+
             body: JSON.stringify({
                 error: { message: e.message },
             }),
