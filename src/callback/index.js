@@ -116,6 +116,8 @@ export const handler = async (event) => {
               "createdAt"
             )
             VALUES ($1, $2, $3, $4, $5, $6)
+                ON CONFLICT ("userId", "provider", "providerAccountId")
+                DO NOTHING;
             `,
             [
                 oAuthConnectionId,
@@ -123,9 +125,9 @@ export const handler = async (event) => {
                 provider,
                 team.id,
                 {
-                    configurationUrl: incomingWebhook.configuration_url,
                     scopes: tokenExchangeResult.scope,
-                    webhookUrl: incomingWebhook.url,
+                    workspaceId: team.id,
+                    workspaceName: team.name,
                     accessToken: tokenExchangeResult.access_token,
                 },
                 now
@@ -149,8 +151,8 @@ export const handler = async (event) => {
                 dbResult.rows[0].userId,
                 "slack",
                 {
-                    workspaceId: team.id,
-                    workspaceName: team.name,
+                    webhookUrl: incomingWebhook.url,
+                    configurationUrl: incomingWebhook.configuration_url,
                     channelId: incomingWebhook.channel_id,
                     channelName: incomingWebhook.channel,
                 },
