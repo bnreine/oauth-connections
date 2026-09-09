@@ -160,7 +160,7 @@ export const handler = async (event) => {
                     channelId: incomingWebhook.channel_id,
                     channelName: incomingWebhook.channel,
                 },
-                connection.oAuthConnectionId,
+                connection.id,
                 now
             ]
         );
