@@ -105,7 +105,7 @@ export const handler = async (event) => {
         const now = new Date();
         const oAuthConnectionId = randomUUID()
 
-        await dbPool.query(
+        const connectionResult = await dbPool.query(
             `
             INSERT INTO "OAuthConnection" (
               "id",
@@ -117,7 +117,9 @@ export const handler = async (event) => {
             )
             VALUES ($1, $2, $3, $4, $5, $6)
                 ON CONFLICT ("userId", "provider", "providerAccountId")
-                DO NOTHING;
+                DO UPDATE SET
+                "authData" = EXCLUDED."authData"
+                returning *
             `,
             [
                 oAuthConnectionId,
@@ -133,6 +135,8 @@ export const handler = async (event) => {
                 now
             ]
         );
+
+        const connection = connectionResult.rows[0];
 
         await dbPool.query(
             `
@@ -156,7 +160,7 @@ export const handler = async (event) => {
                     channelId: incomingWebhook.channel_id,
                     channelName: incomingWebhook.channel,
                 },
-                oAuthConnectionId,
+                connection.oAuthConnectionId,
                 now
             ]
         );
