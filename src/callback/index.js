@@ -146,9 +146,10 @@ export const handler = async (event) => {
               "channelType",
               "metadata",
               "oAuthConnectionId",
-              "createdAt"
+              "createdAt",
+                                       "updatedAt"
             )
-            VALUES ($1, $2, $3, $4, $5, $6)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             `,
             [
                 randomUUID(),
@@ -161,6 +162,7 @@ export const handler = async (event) => {
                     channelName: incomingWebhook.channel,
                 },
                 connection.id,
+                now,
                 now
             ]
         );
